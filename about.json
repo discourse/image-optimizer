@@ -4,8 +4,10 @@
   "license_url": null,
   "component": true,
   "assets": {
-    "mozjpeg_enc": "/assets/mozjpeg_enc.wasm",
-    "wasm_image_loader": "/assets/wasm_image_loader.wasm",
-    "wasm_mozjpeg": "/assets/wasm_mozjpeg.wasm"
+    "image_optimizer_worker": "/assets/image_optimizer_worker.js",
+    "wasm_image_loader_wasm": "/assets/wasm_image_loader.wasm",
+    "wasm_image_loader_js": "/assets/wasm_image_loader.js",
+    "wasm_mozjpeg_wasm": "/assets/wasm_mozjpeg.wasm",
+    "wasm_mozjpeg_js": "/assets/wasm_mozjpeg.js"
  }
 } 
