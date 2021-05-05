@@ -1,0 +1,11 @@
+{
+  "name": "Image Optimizer",
+  "about_url": null,
+  "license_url": null,
+  "component": true,
+  "assets": {
+    "mozjpeg_enc": "/assets/mozjpeg_enc.wasm",
+    "wasm_image_loader": "/assets/wasm_image_loader.wasm",
+    "wasm_mozjpeg": "/assets/wasm_mozjpeg.wasm"
+ }
+} 
