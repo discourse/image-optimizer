@@ -94,7 +94,7 @@ export default {
     };
 
     withPluginApi("0.8.24", (api) => {
-      api.addComposerUploadHandler(["jpg"], function (file, reference) {
+      api.addComposerUploadHandler(["jpg", "jpeg"], function (file, reference) {
         if (file.name.startsWith("optimized_")) {
           return true;
         }
