@@ -1,4 +1,5 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
+import { getURLWithCDN, getAbsoluteURL } from "discourse-common/lib/get-url";
 
 export default {
   name: "image-optimizer",
@@ -11,9 +12,13 @@ export default {
         }
         console.log("Handling upload for", file.name);
 
-        const worker = new Worker(
-          settings.theme_uploads.image_optimizer_worker
+        const content = `importScripts( "${getURLWithCDN(
+          getAbsoluteURL(settings.theme_uploads.image_optimizer_worker)
+        )}" );`;
+        const worker_url = URL.createObjectURL(
+          new Blob([content], { type: "text/javascript" })
         );
+        const worker = new Worker(worker_url);
 
         worker.addEventListener("message", async function (e) {
           console.log("Main: Message received from worker script");
@@ -57,8 +62,12 @@ export default {
         worker.postMessage({
           type: "install",
           list: [
-            settings.theme_uploads.wasm_mozjpeg_js,
-            settings.theme_uploads.wasm_image_loader_js,
+            getURLWithCDN(
+              getAbsoluteURL(settings.theme_uploads.wasm_mozjpeg_js)
+            ),
+            getURLWithCDN(
+              getAbsoluteURL(settings.theme_uploads.wasm_image_loader_js)
+            ),
           ],
         });
         return false;
