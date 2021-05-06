@@ -40,10 +40,12 @@ export default {
                   file: arrayBuffer,
                   file_name: file.name,
                   settings: {
-                    base_url: Discourse.BaseUrl,
-                    wasm_mozjpeg_wasm: settings.theme_uploads.wasm_mozjpeg_wasm,
-                    wasm_image_loader_wasm:
-                      settings.theme_uploads.wasm_image_loader_wasm,
+                    wasm_mozjpeg_wasm: fixScriptURL(
+                      settings.theme_uploads.wasm_mozjpeg_wasm
+                    ),
+                    wasm_image_loader_wasm: fixScriptURL(
+                      settings.theme_uploads.wasm_image_loader_wasm
+                    ),
                   },
                 },
                 [arrayBuffer]

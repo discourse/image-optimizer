@@ -1,7 +1,7 @@
 async function optimize(arrayBuffer, file_name, settings) {
   let encoderModuleOverrides = {
     locateFile: function (path) {
-      return settings.base_url + settings.wasm_mozjpeg_wasm;
+      return settings.wasm_mozjpeg_wasm;
     },
     onRuntimeInitialized: function () {
       return this;
@@ -10,7 +10,7 @@ async function optimize(arrayBuffer, file_name, settings) {
 
   let decoderModuleOverrides = {
     locateFile: function (path) {
-      return settings.base_url + settings.wasm_image_loader_wasm;
+      return settings.wasm_image_loader_wasm;
     },
     onRuntimeInitialized: function () {
       return this;
