@@ -5,6 +5,14 @@ export default {
   name: "image-optimizer",
 
   initialize(container) {
+    function fixScriptURL(url) {
+      if (url.startsWith("/")) {
+        return getAbsoluteURL(url);
+      } else {
+        return url;
+      }
+    }
+
     withPluginApi("0.8.24", (api) => {
       api.addComposerUploadHandler(["jpg", "jpeg"], function (file, reference) {
         if (file.name.startsWith("optimized_")) {
@@ -12,8 +20,8 @@ export default {
         }
         console.log("Handling upload for", file.name);
 
-        const content = `importScripts( "${getURLWithCDN(
-          getAbsoluteURL(settings.theme_uploads.image_optimizer_worker)
+        const content = `importScripts( "${fixScriptURL(
+          settings.theme_uploads.image_optimizer_worker
         )}" );`;
         const worker_url = URL.createObjectURL(
           new Blob([content], { type: "text/javascript" })
@@ -62,12 +70,8 @@ export default {
         worker.postMessage({
           type: "install",
           list: [
-            getURLWithCDN(
-              getAbsoluteURL(settings.theme_uploads.wasm_mozjpeg_js)
-            ),
-            getURLWithCDN(
-              getAbsoluteURL(settings.theme_uploads.wasm_image_loader_js)
-            ),
+            fixScriptURL(settings.theme_uploads.wasm_mozjpeg_js),
+            fixScriptURL(settings.theme_uploads.wasm_image_loader_js),
           ],
         });
         return false;
