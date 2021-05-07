@@ -46,6 +46,10 @@ export default {
                     wasm_image_loader_wasm: fixScriptURL(
                       settings.theme_uploads.wasm_image_loader_wasm
                     ),
+                    resize_width_threshold: settings.resize_width_threshold,
+                    resize_height_threshold: settings.resize_height_threshold,
+                    enable_resize: settings.enable_resize,
+                    enable_reencode: settings.enable_reencode,
                   },
                 },
                 [arrayBuffer]
@@ -59,10 +63,14 @@ export default {
                   type: "image/jpeg",
                 }
               );
-              console.log(optimizedFile);
+              console.log(
+                `Uploading optimized file: ${optimizedFile.byteLength}`
+              );
               $(".wmd-controls").fileupload("add", {
                 files: [optimizedFile],
               });
+
+              worker.terminate();
               break;
             default:
               console.log(`Sorry, we are out of ${e}.`);

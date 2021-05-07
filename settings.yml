@@ -1,1 +1,4 @@
-falco: true
+resize_width_threshold: 1500
+resize_height_threshold: 1500
+enable_resize: true
+enable_reencode: true

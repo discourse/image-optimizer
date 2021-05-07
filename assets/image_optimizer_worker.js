@@ -41,29 +41,36 @@ async function optimize(arrayBuffer, file_name, settings) {
 
   const array = new Uint8Array(arrayBuffer);
 
+  console.log(`Worker received ArrayBuffer: ${arrayBuffer.byteLength}`);
   const decoded = decoder.decode(array, array.length, 3); // 3 means RGB. PNG is 4 cuz RGBA
+  console.log(`Worker decoded: ${decoded.byteLength}`);
   let { channels, height, width } = decoder.dimensions();
+  console.log(`Detected Image Height: ${height}`);
+  console.log(`Detected Image Width: ${width}`);
 
   let resized;
 
-  if (height + width > 3000) {
+  if (settings.enable_resize && width > settings.resize_width_threshold) {
+    const newWidth = settings.resize_width_threshold;
+    const newHeight = height / (width / newWidth);
+
     var decodedClone = Uint8Array.from(decoded); // decoded is allocated from WASM and the .resize method will free it, so we need to copy by value
     resized = decoder.resize(
       decodedClone,
       width,
       height,
       channels,
-      width / 2,
-      height / 2
+      newWidth,
+      newHeight
     );
-    width = width / 2;
-    height = height / 2;
+    width = newWidth;
+    height = newHeight;
+    decoder.free();
   } else {
     resized = decoded;
   }
 
-  console.log(decodedClone);
-  console.log(resized);
+  console.log(`Worker post resize file: ${resized.byteLength}`);
 
   const result = encoder.encode(
     resized,
@@ -72,6 +79,8 @@ async function optimize(arrayBuffer, file_name, settings) {
     channels,
     mozJpegDefaultOptions
   );
+
+  console.log(`Worker post reencode file: ${result.byteLength}`);
 
   let transferrable = Uint8Array.from(result).buffer; // decoded was allocated inside WASM so it can be transfered to another context, need to copy by value
 
@@ -100,7 +109,6 @@ onmessage = async function (e) {
         e.data.file_name,
         e.data.settings
       );
-      console.log(optimized);
       postMessage(
         {
           type: "file",
