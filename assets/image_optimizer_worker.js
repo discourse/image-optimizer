@@ -104,18 +104,25 @@ onmessage = async function (e) {
       });
       break;
     case "compress":
-      let optimized = await optimize(
-        e.data.file,
-        e.data.file_name,
-        e.data.settings
-      );
-      postMessage(
-        {
-          type: "file",
-          file: optimized,
-        },
-        [optimized]
-      );
+      try {
+        let optimized = await optimize(
+          e.data.file,
+          e.data.file_name,
+          e.data.settings
+        );
+        postMessage(
+          {
+            type: "file",
+            file: optimized,
+          },
+          [optimized]
+        );
+      } catch (error) {
+        console.error(error);
+        postMessage({
+          type: "error",
+        });
+      }
       break;
     default:
       console.log(`Sorry, we are out of ${e}.`);
