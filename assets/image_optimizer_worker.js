@@ -42,7 +42,7 @@ async function optimize(arrayBuffer, file_name, settings) {
   const array = new Uint8Array(arrayBuffer);
 
   console.log(`Worker received ArrayBuffer: ${arrayBuffer.byteLength}`);
-  const decoded = decoder.decode(array, array.length, 3); // 3 means RGB. PNG is 4 cuz RGBA
+  const decoded = decoder.decode(array, array.length, 0); // 3 means RGB. PNG is 4 cuz RGBA
   console.log(`Worker decoded: ${decoded.byteLength}`);
   let { channels, height, width } = decoder.dimensions();
   console.log(`Detected Image Height: ${height}`);

@@ -18,8 +18,11 @@ export default {
         { action: "optimizeJPEG" },
         {
           optimizeJPEG: function (data, options) {
+            let file = data.files[data.index];
+            if (!/(\.|\/)(jpe?g)$/i.test(file.type)) {
+              return data;
+            }
             let p = new Promise((resolve, reject) => {
-              let file = data.files[data.index];
               console.log(`Transforming ${file.name}`);
 
               const content = `importScripts( "${fixScriptURL(
