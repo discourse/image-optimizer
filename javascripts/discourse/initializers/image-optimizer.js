@@ -38,12 +38,68 @@ export default {
                 console.log(e);
                 switch (e.data.type) {
                   case "ready":
-                    let arrayBuffer = await file.arrayBuffer();
+                    let drawable;
+                    if ("createImageBitmap" in self) {
+                      drawable = await createImageBitmap(file);
+                    } else {
+                      const url = URL.createObjectURL(file);
+                      const img = new Image();
+                      img.decoding = "async";
+                      img.src = url;
+                      const loaded = new Promise((resolve, reject) => {
+                        img.onload = () => resolve();
+                        img.onerror = () =>
+                          reject(Error("Image loading error"));
+                      });
+
+                      if (img.decode) {
+                        // Nice off-thread way supported in Safari/Chrome.
+                        // Safari throws on decode if the source is SVG.
+                        // https://bugs.webkit.org/show_bug.cgi?id=188347
+                        await img.decode().catch(() => null);
+                      }
+
+                      // Always await loaded, as we may have bailed due to the Safari bug above.
+                      await loaded;
+
+                      drawable = img;
+                    }
+
+                    const width = drawable.width,
+                      height = drawable.height,
+                      sx = 0,
+                      sy = 0,
+                      sw = width,
+                      sh = height;
+                    // Make canvas same size as image
+                    const canvas = document.createElement("canvas");
+                    canvas.width = width;
+                    canvas.height = height;
+                    // Draw image onto canvas
+                    const ctx = canvas.getContext("2d");
+                    if (!ctx)
+                      throw new Error("Could not create canvas context");
+                    ctx.drawImage(
+                      drawable,
+                      sx,
+                      sy,
+                      sw,
+                      sh,
+                      0,
+                      0,
+                      width,
+                      height
+                    );
+                    const imageData = ctx.getImageData(0, 0, width, height);
+                    canvas.remove();
+
                     worker.postMessage(
                       {
                         type: "compress",
-                        file: arrayBuffer,
+                        file: imageData.data.buffer,
                         file_name: file.name,
+                        width: width,
+                        height: height,
                         settings: {
                           wasm_mozjpeg_wasm: fixScriptURL(
                             settings.theme_uploads.wasm_mozjpeg_wasm
@@ -59,7 +115,7 @@ export default {
                           enable_reencode: settings.enable_reencode,
                         },
                       },
-                      [arrayBuffer]
+                      [imageData.data.buffer]
                     );
                     break;
                   case "file":
