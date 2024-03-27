@@ -1,10 +1,10 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
-import { getURLWithCDN, getAbsoluteURL } from "discourse-common/lib/get-url";
+import { getAbsoluteURL } from "discourse-common/lib/get-url";
 
 export default {
   name: "image-optimizer",
 
-  initialize(container) {
+  initialize() {
     function fixScriptURL(url) {
       if (url.startsWith("/")) {
         return getAbsoluteURL(url);
@@ -17,12 +17,13 @@ export default {
       api.addComposerUploadProcessor(
         { action: "optimizeJPEG" },
         {
-          optimizeJPEG: function (data, options) {
+          optimizeJPEG: function (data) {
             let file = data.files[data.index];
             if (!/(\.|\/)(jpe?g)$/i.test(file.type)) {
               return data;
             }
-            let p = new Promise((resolve, reject) => {
+            let p = new Promise((resolve) => {
+              // eslint-disable-next-line no-console
               console.log(`Transforming ${file.name}`);
 
               const content = `importScripts( "${fixScriptURL(
@@ -34,7 +35,9 @@ export default {
               const worker = new Worker(worker_url);
 
               worker.addEventListener("message", async function (e) {
+                // eslint-disable-next-line no-console
                 console.log("Main: Message received from worker script");
+                // eslint-disable-next-line no-console
                 console.log(e);
                 switch (e.data.type) {
                   case "ready":
@@ -46,8 +49,8 @@ export default {
                       const img = new Image();
                       img.decoding = "async";
                       img.src = url;
-                      const loaded = new Promise((resolve, reject) => {
-                        img.onload = () => resolve();
+                      const loaded = new Promise((innerResolve, reject) => {
+                        img.onload = () => innerResolve();
                         img.onerror = () =>
                           reject(Error("Image loading error"));
                       });
@@ -77,8 +80,9 @@ export default {
                     canvas.height = height;
                     // Draw image onto canvas
                     const ctx = canvas.getContext("2d");
-                    if (!ctx)
+                    if (!ctx) {
                       throw new Error("Could not create canvas context");
+                    }
                     ctx.drawImage(
                       drawable,
                       sx,
@@ -98,8 +102,8 @@ export default {
                         type: "compress",
                         file: imageData.data.buffer,
                         file_name: file.name,
-                        width: width,
-                        height: height,
+                        width,
+                        height,
                         settings: {
                           wasm_mozjpeg_wasm: fixScriptURL(
                             settings.theme_uploads.wasm_mozjpeg_wasm
@@ -126,6 +130,7 @@ export default {
                         type: "image/jpeg",
                       }
                     );
+                    // eslint-disable-next-line no-console
                     console.log(
                       `Finished optimization of ${optimizedFile.name} new size: ${optimizedFile.size}.`
                     );
@@ -138,6 +143,7 @@ export default {
                     resolve(data);
                     break;
                   default:
+                    // eslint-disable-next-line no-console
                     console.log(`Sorry, we are out of ${e}.`);
                 }
               });
