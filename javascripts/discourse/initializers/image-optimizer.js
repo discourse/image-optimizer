@@ -1,5 +1,5 @@
+import { getAbsoluteURL } from "discourse/lib/get-url";
 import { withPluginApi } from "discourse/lib/plugin-api";
-import { getAbsoluteURL } from "discourse-common/lib/get-url";
 
 export default {
   name: "image-optimizer",
