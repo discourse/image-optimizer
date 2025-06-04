@@ -1,3 +1,5 @@
+/* eslint-disable */
+// prettier-ignore
 async function optimize(imageData, file_name, width, height, settings) {
   let encoderModuleOverrides = {
     locateFile: function (path) {

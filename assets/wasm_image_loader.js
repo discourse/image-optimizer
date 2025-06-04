@@ -1,4 +1,5 @@
-
+/* eslint-disable */
+// prettier-ignore
 var wasm_image_loader = (function() {
   var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
   if (typeof __filename !== 'undefined') _scriptDir = _scriptDir || __filename;
@@ -13,9 +14,11 @@ var Module=typeof wasm_image_loader!=="undefined"?wasm_image_loader:{};var ready
 }
 );
 })();
-if (typeof exports === 'object' && typeof module === 'object')
+if (typeof exports === "object" && typeof module === "object")
   module.exports = wasm_image_loader;
-else if (typeof define === 'function' && define['amd'])
-  define([], function() { return wasm_image_loader; });
-else if (typeof exports === 'object')
+else if (typeof define === "function" && define["amd"])
+  define([], function () {
+    return wasm_image_loader;
+  });
+else if (typeof exports === "object")
   exports["wasm_image_loader"] = wasm_image_loader;
